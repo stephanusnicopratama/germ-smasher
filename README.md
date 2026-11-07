@@ -35,7 +35,7 @@ For GitHub Pages, pass the subpath: `flutter build web --release --base-href "/g
 
 ## GitHub Pages
 
-1. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+1. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions** (free accounts need a **public** repo for Pages).
 2. Push to `main` or run workflow **Deploy to GitHub Pages** manually.
 3. Play at [https://stephanusnicopratama.github.io/germ-smasher/](https://stephanusnicopratama.github.io/germ-smasher/).
 
