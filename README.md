@@ -31,6 +31,14 @@ flutter build web
 
 Output: `build/web/`.
 
+For GitHub Pages, pass the subpath: `flutter build web --release --base-href "/germ-smasher/"`.
+
+## GitHub Pages
+
+1. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Push to `main` or run workflow **Deploy to GitHub Pages** manually.
+3. Play at [https://stephanusnicopratama.github.io/germ-smasher/](https://stephanusnicopratama.github.io/germ-smasher/).
+
 ## Test
 
 ```bash
