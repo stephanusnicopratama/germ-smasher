@@ -1,13 +1,13 @@
 import 'package:flame/game.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:germ_smasher/game/components/germ.dart';
-import 'package:germ_smasher/game/config/game_config.dart';
+import 'package:germ_smasher/game/config/levels.dart';
 import 'package:germ_smasher/game/germ_smasher_game.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('spawner respects max germs on screen', () async {
+  test('spawner respects the current level cap', () async {
     final game = GermSmasherGame(
       onStateChanged: () {},
       showStartOverlayOnLoad: false,
@@ -16,13 +16,27 @@ void main() {
     await game.onLoad();
     game.onGameResize(Vector2(400, 800));
 
-    for (var i = 0; i < GameConfig.maxGermsOnScreen + 5; i++) {
-      game.update(GameConfig.spawnIntervalSeconds + 0.01);
+    final level = LevelCatalog.levels.first;
+    for (var i = 0; i < level.maxOnScreen + 5; i++) {
+      game.update(level.spawnInterval + 0.01);
     }
 
     expect(
       game.children.whereType<Germ>().length,
-      lessThanOrEqualTo(GameConfig.maxGermsOnScreen),
+      lessThanOrEqualTo(level.maxOnScreen),
     );
+  });
+
+  test('reaching the level goal stops play', () {
+    final game = GermSmasherGame(
+      onStateChanged: () {},
+      showStartOverlayOnLoad: false,
+    );
+    game.isPlaying = true;
+    for (var i = 0; i < game.level.goal; i++) {
+      game.onGermSmashed();
+    }
+    expect(game.isPlaying, isFalse);
+    expect(game.smashedThisLevel, game.level.goal);
   });
 }

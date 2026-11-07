@@ -1,52 +1,68 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/animation.dart';
-import 'package:flutter/material.dart' show Colors;
 
 import '../config/game_config.dart';
+import '../config/germ_looks.dart';
 import '../germ_smasher_game.dart';
 
-class Germ extends CircleComponent with TapCallbacks {
+class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSmasherGame> {
   Germ({
     required Vector2 position,
     required this.velocity,
-    required this.color,
-    required this.game,
+    required this.look,
+    required double displayScale,
   }) : super(
-          radius: GameConfig.germRadius,
           position: position,
           anchor: Anchor.center,
-          paint: Paint()..color = color,
-        ) {
-    add(
-      CircleComponent(
-        radius: GameConfig.germRadius * 0.35,
-        anchor: Anchor.center,
-        position: Vector2(-8, -6),
-        paint: Paint()..color = const Color(0xFFFFFFFF).withValues(alpha: 0.35),
-      ),
-    );
-  }
+          scale: Vector2.all(displayScale),
+        );
 
   final Vector2 velocity;
-  final Color color;
-  final GermSmasherGame game;
+  final GermLook look;
   bool _smashed = false;
+  double _wobble = 0;
 
   @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    final bounds = size;
-    final minX = radius;
-    final maxX = bounds.x - radius;
-    final minY = radius;
-    final maxY = bounds.y - radius;
-    position.x = position.x.clamp(minX, maxX).toDouble();
-    position.y = position.y.clamp(minY, maxY).toDouble();
+  Future<void> onLoad() async {
+    final body = Sprite(game.images.fromCache('germs/${look.body}'));
+    size = body.srcSize;
+    add(SpriteComponent(sprite: body, anchor: Anchor.center));
+    final eye = Sprite(game.images.fromCache('germs/${look.eye}'));
+    add(
+      SpriteComponent(
+        sprite: eye,
+        anchor: Anchor.center,
+        position: Vector2(-size.x * 0.16, -size.y * 0.06),
+      ),
+    );
+    add(
+      SpriteComponent(
+        sprite: eye,
+        anchor: Anchor.center,
+        position: Vector2(size.x * 0.16, -size.y * 0.06),
+      ),
+    );
+    add(
+      SpriteComponent(
+        sprite: Sprite(game.images.fromCache('germs/${look.mouth}')),
+        anchor: Anchor.center,
+        position: Vector2(0, size.y * 0.2),
+      ),
+    );
+    final extra = look.extra;
+    if (extra != null) {
+      add(
+        SpriteComponent(
+          sprite: Sprite(game.images.fromCache('germs/$extra')),
+          anchor: Anchor.center,
+          position: Vector2(0, size.y * look.extraY),
+        ),
+      );
+    }
   }
 
   @override
@@ -55,22 +71,22 @@ class Germ extends CircleComponent with TapCallbacks {
     if (_smashed) {
       return;
     }
+    _wobble += dt;
+    angle = sin(_wobble * 3) * 0.08;
     position += velocity * dt;
     final bounds = game.size;
-    if (bounds.x <= 0 || bounds.y <= 0) {
+    if (bounds.x <= 0 || bounds.y <= 0 || size.x <= 0) {
       return;
     }
-    final minX = radius;
-    final maxX = bounds.x - radius;
-    final minY = radius;
-    final maxY = bounds.y - radius;
-    if (position.x <= minX || position.x >= maxX) {
+    final halfW = size.x * scale.x / 2;
+    final halfH = size.y * scale.y / 2;
+    if (position.x <= halfW || position.x >= bounds.x - halfW) {
       velocity.x = -velocity.x;
-      position.x = position.x.clamp(minX, maxX).toDouble();
+      position.x = position.x.clamp(halfW, bounds.x - halfW).toDouble();
     }
-    if (position.y <= minY || position.y >= maxY) {
+    if (position.y <= halfH || position.y >= bounds.y - halfH) {
       velocity.y = -velocity.y;
-      position.y = position.y.clamp(minY, maxY).toDouble();
+      position.y = position.y.clamp(halfH, bounds.y - halfH).toDouble();
     }
   }
 
@@ -86,8 +102,8 @@ class Germ extends CircleComponent with TapCallbacks {
     _smashed = true;
     game.onGermSmashed();
     add(
-      ScaleEffect.to(
-        Vector2.all(1.6),
+      ScaleEffect.by(
+        Vector2.all(1.28),
         EffectController(duration: 0.12, curve: Curves.easeOut),
         onComplete: () {
           if (isMounted) {
@@ -96,22 +112,11 @@ class Germ extends CircleComponent with TapCallbacks {
         },
       ),
     );
-    paint.color = Colors.white.withValues(alpha: 0.85);
   }
 
   @override
   bool containsLocalPoint(Vector2 point) {
-    return point.length <= radius + GameConfig.tapHitPadding;
+    final pad = GameConfig.tapHitPadding;
+    return point.x.abs() <= size.x / 2 + pad && point.y.abs() <= size.y / 2 + pad;
   }
 }
-
-final _germColors = [
-  const Color(0xFF7BC950),
-  const Color(0xFF5ADBB5),
-  const Color(0xFFB388FF),
-  const Color(0xFFFFB74D),
-  const Color(0xFF64B5F6),
-];
-
-Color randomGermColor(Random random) =>
-    _germColors[random.nextInt(_germColors.length)];

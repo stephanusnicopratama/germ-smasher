@@ -15,7 +15,19 @@ class HudOverlay extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _ScoreBadge(score: game.score),
+            Row(
+              children: [
+                _Pill(
+                  icon: Icons.flag_rounded,
+                  label: '${game.level.number}',
+                ),
+                const SizedBox(width: 8),
+                _Pill(
+                  icon: Icons.coronavirus,
+                  label: '${game.smashedThisLevel}/${game.level.goal}',
+                ),
+              ],
+            ),
             Row(
               children: [
                 IconButton.filledTonal(
@@ -40,15 +52,16 @@ class HudOverlay extends StatelessWidget {
   }
 }
 
-class _ScoreBadge extends StatelessWidget {
-  const _ScoreBadge({required this.score});
+class _Pill extends StatelessWidget {
+  const _Pill({required this.icon, required this.label});
 
-  final int score;
+  final IconData icon;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(24),
@@ -63,14 +76,14 @@ class _ScoreBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.coronavirus, color: Colors.green.shade600, size: 28),
-          const SizedBox(width: 8),
+          Icon(icon, color: Colors.green.shade700, size: 26),
+          const SizedBox(width: 6),
           Text(
-            '$score',
+            label,
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.green.shade800,
+              color: Colors.green.shade900,
             ),
           ),
         ],

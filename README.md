@@ -47,6 +47,9 @@ flutter test
 
 ## Play
 
-1. Tap the large **play** button.
-2. Tap moving germs to smash them; the score increases.
-3. **Home** returns to the start screen; **mute** toggles sound (SFX can be wired later).
+1. Tap the large **play** button. Level 1 starts.
+2. Tap the cartoon germs until the counter reaches the goal (5, then 8, 10, 12, 15).
+3. A star marks the level clear. The arrow starts the next level. After level 5, the trophy replays from level 1.
+4. **Home** returns to the start screen.
+
+Sprites are Kenney's Monster Builder Pack (CC0). See [CREDITS.md](CREDITS.md).

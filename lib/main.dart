@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'game/germ_smasher_game.dart';
 import 'overlays/hud_overlay.dart';
+import 'overlays/level_clear_overlay.dart';
 import 'overlays/start_overlay.dart';
 
 void main() {
@@ -48,6 +49,8 @@ class _GermSmasherAppState extends State<GermSmasherApp> {
             'start': (context, game) =>
                 StartOverlay(game: game as GermSmasherGame),
             'hud': (context, game) => HudOverlay(game: game as GermSmasherGame),
+            'clear': (context, game) =>
+                LevelClearOverlay(game: game as GermSmasherGame),
           },
         ),
       ),
