@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import '../config/germ_looks.dart';
 import '../germ_smasher_game.dart';
 import 'germ.dart';
+import 'soap_bubble.dart';
 
 class GermSpawner extends Component with HasGameReference<GermSmasherGame> {
   GermSpawner({Random? random}) : _random = random ?? Random();
@@ -12,7 +13,9 @@ class GermSpawner extends Component with HasGameReference<GermSmasherGame> {
   final Random _random;
   double _timer = 0;
 
-  int get _germCount => game.children.whereType<Germ>().length;
+  int get _onScreen =>
+      game.children.whereType<Germ>().length +
+      game.children.whereType<SoapBubble>().length;
 
   @override
   void update(double dt) {
@@ -26,7 +29,11 @@ class GermSpawner extends Component with HasGameReference<GermSmasherGame> {
       return;
     }
     _timer = 0;
-    if (_germCount >= level.maxOnScreen) {
+    if (_onScreen >= level.maxOnScreen) {
+      return;
+    }
+    if (level.soapChance > 0 && _random.nextDouble() < level.soapChance) {
+      _spawnSoap();
       return;
     }
     _spawnGerm();
@@ -54,7 +61,27 @@ class GermSpawner extends Component with HasGameReference<GermSmasherGame> {
         position: position,
         velocity: velocity,
         look: GermLook.looks[_random.nextInt(GermLook.looks.length)],
+        lifetime: level.lifetime,
         displayScale: level.germScale * screenBoost,
+      ),
+    );
+  }
+
+  void _spawnSoap() {
+    final size = game.size;
+    final level = game.level;
+    final margin = 80.0;
+    final position = Vector2(
+      margin + _random.nextDouble() * max(1.0, size.x - margin * 2),
+      margin + _random.nextDouble() * max(1.0, size.y - margin * 2),
+    );
+    final angle = _random.nextDouble() * pi * 2;
+    final speed = level.minSpeed * 0.75;
+    game.enqueue(
+      SoapBubble(
+        position: position,
+        velocity: Vector2(cos(angle), sin(angle)) * speed,
+        lifetime: level.lifetime,
       ),
     );
   }

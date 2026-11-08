@@ -1,7 +1,9 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
+import 'game/audio/game_sfx.dart';
 import 'game/germ_smasher_game.dart';
+import 'overlays/fail_overlay.dart';
 import 'overlays/hud_overlay.dart';
 import 'overlays/level_clear_overlay.dart';
 import 'overlays/start_overlay.dart';
@@ -23,7 +25,10 @@ class _GermSmasherAppState extends State<GermSmasherApp> {
   @override
   void initState() {
     super.initState();
-    _game = GermSmasherGame(onStateChanged: () => setState(() {}));
+    _game = GermSmasherGame(
+      onStateChanged: () => setState(() {}),
+      sfx: GameSfx(),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
@@ -51,6 +56,8 @@ class _GermSmasherAppState extends State<GermSmasherApp> {
             'hud': (context, game) => HudOverlay(game: game as GermSmasherGame),
             'clear': (context, game) =>
                 LevelClearOverlay(game: game as GermSmasherGame),
+            'fail': (context, game) =>
+                FailOverlay(game: game as GermSmasherGame),
           },
         ),
       ),

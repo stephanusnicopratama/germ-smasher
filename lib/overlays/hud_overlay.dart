@@ -15,16 +15,35 @@ class HudOverlay extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _Pill(
-                  icon: Icons.flag_rounded,
-                  label: '${game.level.number}',
-                ),
-                const SizedBox(width: 8),
-                _Pill(
-                  icon: Icons.coronavirus,
-                  label: '${game.smashedThisLevel}/${game.level.goal}',
+                _Hearts(hearts: game.hearts),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    _Pill(
+                      icon: Icons.star_rounded,
+                      label: '${game.score}',
+                    ),
+                    const SizedBox(width: 8),
+                    _Pill(
+                      icon: Icons.flag_rounded,
+                      label: '${game.level.number}',
+                    ),
+                    const SizedBox(width: 8),
+                    _Pill(
+                      icon: Icons.coronavirus,
+                      label: '${game.smashedThisLevel}/${game.level.goal}',
+                    ),
+                    if (game.combo > 1) ...[
+                      const SizedBox(width: 8),
+                      _Pill(
+                        icon: Icons.bolt,
+                        label: 'x${game.combo}',
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),
@@ -48,6 +67,27 @@ class HudOverlay extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _Hearts extends StatelessWidget {
+  const _Hearts({required this.hearts});
+
+  final int hearts;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < 4; i++)
+          Icon(
+            i < hearts ? Icons.favorite : Icons.favorite_border,
+            color: Colors.red.shade400,
+            size: 26,
+          ),
+      ],
     );
   }
 }

@@ -14,8 +14,10 @@ class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSma
     required Vector2 position,
     required this.velocity,
     required this.look,
+    required this.lifetime,
     required double displayScale,
-  }) : super(
+  })  : _baseScale = displayScale,
+        super(
           position: position,
           anchor: Anchor.center,
           scale: Vector2.all(displayScale),
@@ -23,7 +25,11 @@ class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSma
 
   final Vector2 velocity;
   final GermLook look;
+  final double lifetime;
+  final double _baseScale;
   bool _smashed = false;
+  bool _escaped = false;
+  double age = 0;
   double _wobble = 0;
 
   @override
@@ -68,11 +74,20 @@ class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSma
   @override
   void update(double dt) {
     super.update(dt);
-    if (_smashed) {
+    if (_smashed || _escaped) {
       return;
     }
+    age += dt;
     _wobble += dt;
     angle = sin(_wobble * 3) * 0.08;
+    if (age > lifetime * 0.7) {
+      final pulse = 1 + sin(_wobble * 16) * 0.08;
+      scale = Vector2.all(_baseScale * pulse);
+    }
+    if (age >= lifetime) {
+      _escape();
+      return;
+    }
     position += velocity * dt;
     final bounds = game.size;
     if (bounds.x <= 0 || bounds.y <= 0 || size.x <= 0) {
@@ -98,16 +113,23 @@ class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSma
     _smash();
   }
 
+  void _escape() {
+    _escaped = true;
+    game.onGermEscaped();
+    game.retire(this);
+  }
+
   void _smash() {
     _smashed = true;
-    game.onGermSmashed();
+    final quick = age < lifetime * 0.45;
+    game.onGermSmashed(quick: quick);
     add(
       ScaleEffect.by(
         Vector2.all(1.28),
         EffectController(duration: 0.12, curve: Curves.easeOut),
         onComplete: () {
           if (isMounted) {
-            removeFromParent();
+            game.retire(this);
           }
         },
       ),

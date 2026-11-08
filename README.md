@@ -47,9 +47,10 @@ flutter test
 
 ## Play
 
-1. Tap the large **play** button. Level 1 starts.
-2. Tap the cartoon germs until the counter reaches the goal (5, then 8, 10, 12, 15).
-3. A star marks the level clear. The arrow starts the next level. After level 5, the trophy replays from level 1.
-4. **Home** returns to the start screen.
+1. Tap **play**. Sound is on. The speaker button turns it off.
+2. Smash germs before they flash and slip away. A miss costs a heart. Blue soap bubbles are not germs: leave them, or you lose a heart.
+3. Score is on the star. Fast taps and combos are worth more. Clear the goal (8, 10, 12, 14, 18) to bank a level bonus.
+4. Lose all 4 hearts and the run ends. The score stays on screen. Replay starts over.
+5. **Home** returns to the start screen.
 
 Sprites are Kenney's Monster Builder Pack (CC0). See [CREDITS.md](CREDITS.md).

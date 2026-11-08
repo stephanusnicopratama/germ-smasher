@@ -34,9 +34,10 @@ void main() {
     );
     game.isPlaying = true;
     for (var i = 0; i < game.level.goal; i++) {
-      game.onGermSmashed();
+      game.onGermSmashed(quick: false);
     }
     expect(game.isPlaying, isFalse);
     expect(game.smashedThisLevel, game.level.goal);
+    expect(game.score, greaterThan(0));
   });
 }

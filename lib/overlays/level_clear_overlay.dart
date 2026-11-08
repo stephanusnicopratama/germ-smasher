@@ -23,7 +23,7 @@ class LevelClearOverlay extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '${game.level.number}',
+              '${game.score}',
               style: const TextStyle(
                 fontSize: 42,
                 fontWeight: FontWeight.w800,
