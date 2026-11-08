@@ -83,6 +83,7 @@ class GermSmasherGame extends FlameGame {
     await super.onLoad();
     await images.loadAll([
       for (final name in GermLook.assetFiles) 'germs/$name',
+      for (final name in SoapBubble.sprites) 'bubbles/$name',
     ]);
     add(PlayfieldBackground());
     _spawner = GermSpawner();

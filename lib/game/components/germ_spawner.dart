@@ -66,10 +66,13 @@ class GermSpawner extends Component with HasGameReference<GermSmasherGame> {
       return;
     }
     final lane = CrawlLane.across(_random, size, game.level.minSpeed * 0.75, 70);
+    final screenBoost = (min(size.x, size.y) / 720).clamp(0.9, 1.45);
     game.enqueue(
       SoapBubble(
         position: lane.position,
         velocity: lane.velocity,
+        spriteName: SoapBubble.sprites[_random.nextInt(SoapBubble.sprites.length)],
+        displayScale: game.level.germScale * screenBoost * 0.85,
       ),
     );
   }
