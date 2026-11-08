@@ -48,7 +48,7 @@ flutter test
 ## Play
 
 1. Tap **play**. Sound is on. The speaker button turns it off.
-2. Smash germs before they flash and slip away. A miss costs a heart. Blue soap bubbles are not germs: leave them, or you lose a heart.
+2. Germs crawl straight across: left to right, right to left, top to bottom, or bottom to top. Smash them before they leave the other side. A miss costs a heart. Blue soap bubbles crawl the same way: leave them, or you lose a heart.
 3. Score is on the star. Fast taps and combos are worth more. Clear the goal (8, 10, 12, 14, 18) to bank a level bonus.
 4. Lose all 4 hearts and the run ends. The score stays on screen. Replay starts over.
 5. **Home** returns to the start screen.

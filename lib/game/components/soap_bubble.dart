@@ -6,13 +6,13 @@ import 'package:flame/events.dart';
 import 'package:flutter/animation.dart';
 
 import '../germ_smasher_game.dart';
+import 'crawl_lane.dart';
 
 class SoapBubble extends CircleComponent
     with TapCallbacks, HasGameReference<GermSmasherGame> {
   SoapBubble({
     required Vector2 position,
     required this.velocity,
-    required this.lifetime,
   }) : super(
           radius: 34,
           position: position,
@@ -21,8 +21,6 @@ class SoapBubble extends CircleComponent
         );
 
   final Vector2 velocity;
-  final double lifetime;
-  double age = 0;
   bool _gone = false;
 
   @override
@@ -43,9 +41,14 @@ class SoapBubble extends CircleComponent
     if (_gone) {
       return;
     }
-    age += dt;
     position += velocity * dt;
-    if (age >= lifetime) {
+    if (hasLeftScreen(
+      position: position,
+      velocity: velocity,
+      screen: game.size,
+      halfW: radius,
+      halfH: radius,
+    )) {
       _leaveSafely();
     }
   }

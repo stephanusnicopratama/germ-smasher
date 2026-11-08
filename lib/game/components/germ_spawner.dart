@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 
 import '../config/germ_looks.dart';
 import '../germ_smasher_game.dart';
+import 'crawl_lane.dart';
 import 'germ.dart';
 import 'soap_bubble.dart';
 
@@ -45,23 +46,15 @@ class GermSpawner extends Component with HasGameReference<GermSmasherGame> {
       return;
     }
     final level = game.level;
-    final margin = 90 * level.germScale;
-    final spanX = max(1.0, size.x - margin * 2);
-    final spanY = max(1.0, size.y - margin * 2);
-    final position = Vector2(
-      margin + _random.nextDouble() * spanX,
-      margin + _random.nextDouble() * spanY,
-    );
-    final angle = _random.nextDouble() * pi * 2;
-    final speed = level.minSpeed + _random.nextDouble() * (level.maxSpeed - level.minSpeed);
-    final velocity = Vector2(cos(angle), sin(angle)) * speed;
+    final speed = level.minSpeed +
+        _random.nextDouble() * (level.maxSpeed - level.minSpeed);
+    final lane = CrawlLane.across(_random, size, speed, 90);
     final screenBoost = (min(size.x, size.y) / 720).clamp(0.9, 1.45);
     game.enqueue(
       Germ(
-        position: position,
-        velocity: velocity,
+        position: lane.position,
+        velocity: lane.velocity,
         look: GermLook.looks[_random.nextInt(GermLook.looks.length)],
-        lifetime: level.lifetime,
         displayScale: level.germScale * screenBoost,
       ),
     );
@@ -69,19 +62,14 @@ class GermSpawner extends Component with HasGameReference<GermSmasherGame> {
 
   void _spawnSoap() {
     final size = game.size;
-    final level = game.level;
-    final margin = 80.0;
-    final position = Vector2(
-      margin + _random.nextDouble() * max(1.0, size.x - margin * 2),
-      margin + _random.nextDouble() * max(1.0, size.y - margin * 2),
-    );
-    final angle = _random.nextDouble() * pi * 2;
-    final speed = level.minSpeed * 0.75;
+    if (size.x <= 0 || size.y <= 0) {
+      return;
+    }
+    final lane = CrawlLane.across(_random, size, game.level.minSpeed * 0.75, 70);
     game.enqueue(
       SoapBubble(
-        position: position,
-        velocity: Vector2(cos(angle), sin(angle)) * speed,
-        lifetime: level.lifetime,
+        position: lane.position,
+        velocity: lane.velocity,
       ),
     );
   }

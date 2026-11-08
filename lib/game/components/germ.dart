@@ -8,13 +8,13 @@ import 'package:flutter/animation.dart';
 import '../config/game_config.dart';
 import '../config/germ_looks.dart';
 import '../germ_smasher_game.dart';
+import 'crawl_lane.dart';
 
 class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSmasherGame> {
   Germ({
     required Vector2 position,
     required this.velocity,
     required this.look,
-    required this.lifetime,
     required double displayScale,
   })  : _baseScale = displayScale,
         super(
@@ -25,11 +25,9 @@ class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSma
 
   final Vector2 velocity;
   final GermLook look;
-  final double lifetime;
   final double _baseScale;
   bool _smashed = false;
   bool _escaped = false;
-  double age = 0;
   double _wobble = 0;
 
   @override
@@ -77,16 +75,13 @@ class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSma
     if (_smashed || _escaped) {
       return;
     }
-    age += dt;
     _wobble += dt;
-    angle = sin(_wobble * 3) * 0.08;
-    if (age > lifetime * 0.7) {
+    final lean = velocity.x == 0 ? 0.0 : (velocity.x > 0 ? 0.35 : -0.35);
+    angle = lean + sin(_wobble * 3) * 0.08;
+    final progress = crawlProgress(position, velocity, game.size);
+    if (progress > 0.7) {
       final pulse = 1 + sin(_wobble * 16) * 0.08;
       scale = Vector2.all(_baseScale * pulse);
-    }
-    if (age >= lifetime) {
-      _escape();
-      return;
     }
     position += velocity * dt;
     final bounds = game.size;
@@ -95,13 +90,14 @@ class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSma
     }
     final halfW = size.x * scale.x / 2;
     final halfH = size.y * scale.y / 2;
-    if (position.x <= halfW || position.x >= bounds.x - halfW) {
-      velocity.x = -velocity.x;
-      position.x = position.x.clamp(halfW, bounds.x - halfW).toDouble();
-    }
-    if (position.y <= halfH || position.y >= bounds.y - halfH) {
-      velocity.y = -velocity.y;
-      position.y = position.y.clamp(halfH, bounds.y - halfH).toDouble();
+    if (hasLeftScreen(
+      position: position,
+      velocity: velocity,
+      screen: bounds,
+      halfW: halfW,
+      halfH: halfH,
+    )) {
+      _escape();
     }
   }
 
@@ -121,7 +117,7 @@ class Germ extends PositionComponent with TapCallbacks, HasGameReference<GermSma
 
   void _smash() {
     _smashed = true;
-    final quick = age < lifetime * 0.45;
+    final quick = crawlProgress(position, velocity, game.size) < 0.45;
     game.onGermSmashed(quick: quick);
     add(
       ScaleEffect.by(
